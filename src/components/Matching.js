@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Select, MenuItem, FormControl, InputLabel, Tooltip, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
-import { ButtonGroup, Button } from '@mui/material';
+import { ButtonGroup } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import { candidates, jobs } from '../data/Data';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
@@ -77,7 +77,7 @@ function Matching() {
 
     const sorted = candidateScores.sort((a, b) => b.matchScore - a.matchScore);
     setSortedCandidates(sorted);
-  }, [selectedJobId]);
+  }, [selectedJob, selectedJobId]);
 
  return (
     <div>

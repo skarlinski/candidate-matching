@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/candidate-matching/static/css/main.8be86c20.css",
+    "main.js": "/candidate-matching/static/js/main.fab4ab98.js",
+    "index.html": "/candidate-matching/index.html",
+    "main.8be86c20.css.map": "/candidate-matching/static/css/main.8be86c20.css.map",
+    "main.fab4ab98.js.map": "/candidate-matching/static/js/main.fab4ab98.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.8be86c20.css",
+    "static/js/main.fab4ab98.js"
+  ]
+}

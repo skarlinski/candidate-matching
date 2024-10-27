@@ -802,3 +802,44 @@ export const jobs = [
   },
   // Additional jobs can be added here with full descriptions...
 ];
+
+// src/data/Data.js
+
+export const categoryMatrix = {
+  'Sales and Business Development': {
+    'Sales and Business Development': 1.0,
+    'Marketing': 0.8,
+    'Product Management': 0.6,
+    'Human Resources': 0.4,
+    'UI/UX Design': 0.2,
+  },
+  'Marketing': {
+    'Sales and Business Development': 0.8,
+    'Marketing': 1.0,
+    'Product Management': 0.7,
+    'Human Resources': 0.5,
+    'UI/UX Design': 0.3,
+  },
+  'Product Management': {
+    'Sales and Business Development': 0.6,
+    'Marketing': 0.7,
+    'Product Management': 1.0,
+    'Human Resources': 0.5,
+    'UI/UX Design': 0.4,
+  },
+  'Human Resources': {
+    'Sales and Business Development': 0.4,
+    'Marketing': 0.5,
+    'Product Management': 0.5,
+    'Human Resources': 1.0,
+    'UI/UX Design': 0.3,
+  },
+  'UI/UX Design': {
+    'Sales and Business Development': 0.2,
+    'Marketing': 0.3,
+    'Product Management': 0.4,
+    'Human Resources': 0.3,
+    'UI/UX Design': 1.0,
+  },
+};
+

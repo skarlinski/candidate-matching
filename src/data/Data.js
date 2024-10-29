@@ -1091,7 +1091,7 @@ export const softwareEngineerCandidates = [
     company: 'Priority Software',
     companyScore: 3,
     currentPosition: 'DevOps Engineer',
-    seniorityLevel: 2,
+    seniorityLevel: 1,
     yearsOfExperience: 1.8,
     educationQuality: 3,
     education: "Bachelor's degree, Computer Science (Holon Institute of Technology, In progress)",

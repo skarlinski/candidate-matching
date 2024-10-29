@@ -19,13 +19,12 @@ function App() {
           </Typography>
           <Button color="inherit" component={Link} to="/candidates">Candidates</Button>
           <Button color="inherit" component={Link} to="/jobs">Job Descriptions</Button>
-          <Button color="inherit" component={Link} to="/matching">Matching</Button>
-          <Button color="inherit" component={Link} to="/software-matching">Software</Button>
+          <Button color="inherit" component={Link} to="/software-matching">Matching</Button>
         </Toolbar>
       </AppBar>
       <div style={{ padding: '20px' }}>
         <Routes>
-          <Route path="/" element={<Candidates />} />
+          <Route path="/" element={<SoftwareEngineerMatching />} />
           <Route path="/candidates" element={<Candidates />} />
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/matching" element={<Matching />} />

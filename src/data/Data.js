@@ -1243,6 +1243,53 @@ export const softwareEngineerCandidates = [
     email: 'gal.barak@example.com',
     linkedin: 'https://www.linkedin.com/in/gal-barak-18789a2/',
   },
+   {
+    "id": 11,
+    "name": "Gilad Efrati",
+    "category": "Frontend Development",
+    "company": "Lemonade",
+    "companyScore": 4,
+    "currentPosition": "Frontend Engineer",
+    "seniorityLevel": 2,
+    "yearsOfExperience": 4,
+    "educationQuality": 4,
+    "education": "Double Major B.Sc., Computer Science & Entrepreneurship (Reichman University)",
+    "phone": "",
+    "email": "",
+    "linkedin": ""
+  },
+  // Candidate 12: Oron Nir
+  {
+    "id": 12,
+    "name": "Oron Nir",
+    "category": "Software Engineering",
+    "company": "Microsoft",
+    "companyScore": 5,
+    "currentPosition": "Principal Researcher",
+    "seniorityLevel": 4,
+    "yearsOfExperience": 10,
+    "educationQuality": 5,
+    "education": "Doctor of Philosophy - PhD, Computer Science (Reichman University)",
+    "phone": "",
+    "email": "",
+    "linkedin": ""
+  },
+  // Candidate 13: Michael Zolotov
+  {
+    "id": 13,
+    "name": "Michael Zolotov",
+    "category": "Leadership",
+    "company": "Razor Labs",
+    "companyScore": 5,
+    "currentPosition": "CTO",
+    "seniorityLevel": 5,
+    "yearsOfExperience": 12,
+    "educationQuality": 5,
+    "education": "Master of Science (M.Sc), Electrical Engineering (Tel Aviv University)",
+    "phone": "",
+    "email": "",
+    "linkedin": ""
+  }
 ];
 
 // src/data/Data.js

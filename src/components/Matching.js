@@ -9,40 +9,59 @@ import InfoIcon from '@mui/icons-material/Info';
 import { candidates, jobs } from '../data/Data';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 
-// src/components/Matching.js
-
-import { categoryMatrix } from '../data/Data';
 
 function calculateMatchScore(candidate, job) {
-  // Category score from the category matrix
-  const categoryScore = categoryMatrix[candidate.category][job.category];
-
-  // Company score
-  const companyScoreNormalized =
-    (Math.min(candidate.companyScore, job.companyScoreRange[1]) -
-      job.companyScoreRange[0]) /
-    (job.companyScoreRange[1] - job.companyScoreRange[0]);
-
-  // Seniority level score
-  const seniorityLevelNormalized =
-    (Math.min(candidate.seniorityLevel, job.seniorityLevelRange[1]) -
-      job.seniorityLevelRange[0]) /
-    (job.seniorityLevelRange[1] - job.seniorityLevelRange[0]);
-
-  // Weights
+  let score = 0;
   const weights = job.weights;
 
-  // Compute the weighted sum
-  const matchScore =
-    categoryScore * weights.category +
-    companyScoreNormalized * weights.companyScore +
-    seniorityLevelNormalized * weights.seniorityLevel;
+  // Category match
+  if (candidate.category === job.category) {
+    score += weights.category * 5;
+  }
 
-  // Normalize the match score
-  const maxPossibleScore =
-    weights.category + weights.companyScore + weights.seniorityLevel;
+  // Company score
+  if (
+    candidate.companyScore >= job.companyScoreRange[0] &&
+    candidate.companyScore <= job.companyScoreRange[1]
+  ) {
+    score += weights.companyScore * candidate.companyScore;
+  } else {
+    // Penalize if company score is lower
+    score += weights.companyScore * Math.max(0, candidate.companyScore - 1);
+  }
 
-  return (matchScore / maxPossibleScore) * 100; // Return as a percentage
+  // Seniority level
+  if (
+    candidate.seniorityLevel >= job.seniorityLevelRange[0] &&
+    candidate.seniorityLevel <= job.seniorityLevelRange[1]
+  ) {
+    score += weights.seniorityLevel * candidate.seniorityLevel;
+  } else {
+    // Penalize if seniority does not match
+    score += weights.seniorityLevel * Math.max(0, candidate.seniorityLevel - 1);
+  }
+
+  // Years of experience
+  if (candidate.yearsOfExperience >= job.yearsOfExperience) {
+    score += weights.yearsOfExperience * 5;
+  } else {
+    // Scale score based on proximity
+    const experienceScore =
+      (candidate.yearsOfExperience / job.yearsOfExperience) * 5;
+    score += weights.yearsOfExperience * experienceScore;
+  }
+
+  // Education quality
+  if (
+    candidate.educationQuality >= job.educationQualityRange[0] &&
+    candidate.educationQuality <= job.educationQualityRange[1]
+  ) {
+    score += weights.educationQuality * candidate.educationQuality;
+  } else {
+    score += weights.educationQuality * Math.max(0, candidate.educationQuality - 1);
+  }
+
+  return score;
 }
 
 function Matching() {
@@ -104,6 +123,7 @@ function Matching() {
         <strong>Company:</strong> {candidate.company}{'\n'}
         <strong>Position:</strong> {candidate.currentPosition}{'\n'}
         <strong>Seniority Level:</strong> {candidate.seniorityLevel}{'\n'}
+        <strong>Years of Experience:</strong> {candidate.yearsOfExperience}{'\n'}
         <strong>Education Quality:</strong> {candidate.educationQuality}{'\n'}
         <strong>Education:</strong> {candidate.education}{'\n'}
         <strong>Phone:</strong> {candidate.phone}{'\n'}

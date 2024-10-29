@@ -6,6 +6,8 @@ import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 import Candidates from './components/Candidates';
 import Jobs from './components/Jobs';
 import Matching from './components/Matching';
+import SoftwareEngineerMatching from './components/SoftwareEngineerMatching';
+
 
 function App() {
   return (
@@ -18,6 +20,7 @@ function App() {
           <Button color="inherit" component={Link} to="/candidates">Candidates</Button>
           <Button color="inherit" component={Link} to="/jobs">Job Descriptions</Button>
           <Button color="inherit" component={Link} to="/matching">Matching</Button>
+          <Button color="inherit" component={Link} to="/software-matching">Software</Button>
         </Toolbar>
       </AppBar>
       <div style={{ padding: '20px' }}>
@@ -26,6 +29,7 @@ function App() {
           <Route path="/candidates" element={<Candidates />} />
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/matching" element={<Matching />} />
+          <Route path="/software-matching" element={<SoftwareEngineerMatching />} />
         </Routes>
       </div>
     </Router>

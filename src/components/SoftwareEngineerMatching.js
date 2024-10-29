@@ -22,7 +22,6 @@ import {
   Grid,
   Card,
   CardContent,
-  CardActions,
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';

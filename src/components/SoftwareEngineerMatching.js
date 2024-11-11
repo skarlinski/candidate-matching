@@ -102,7 +102,7 @@ const response = await fetch('https://api.openai.com/v1/chat/completions', {
     Authorization: `Bearer ${apiKey}`,
   },
   body: JSON.stringify({
-    model: 'gpt-4',
+    model: 'gpt-4o',
     messages: [
       {
         role: 'system',
@@ -210,59 +210,80 @@ ${jobDescription}
       seniorityScore = 1.0; // Perfect match
     } else if (difference === 1) {
       seniorityScore = 0.7; // Acceptable
+    } else if (difference === 2) {
+      seniorityScore = 0.3; // Acceptable
     } else {
-      seniorityScore = 0.0; // Penalize
+      seniorityScore = -1; // Penalize
     }
 
     return seniorityScore;
   }
 
   // Calculate the match score and provide match details
-  function calculateMatchScore(candidate, job) {
-    // Get the candidate's category scores
-    const candidateCategories = softwareCategoryMatrix[candidate.category];
-    if (!candidateCategories) {
-      console.error(
-        `Candidate category '${candidate.category}' not found in category matrix.`
-      );
-      return { matchScore: 0, matchDetails: {} };
-    }
-
-    // Get the category score between the candidate and the job
-    const categoryScore = candidateCategories[job.category] || 0;
-
-    // Normalize the company score
-    const companyScoreNormalized = normalizeCompanyScore(candidate.companyScore);
-
-    // Calculate seniority score based on distance
-    const seniorityScore = calculateSeniorityScore(
-      candidate.seniorityLevel,
-      job.seniorityLevelTarget
+// Calculate the match score and provide match details
+function calculateMatchScore(candidate, job) {
+  // Get the candidate's category scores
+  const candidateCategories = softwareCategoryMatrix[candidate.category];
+  if (!candidateCategories) {
+    console.error(
+      `Candidate category '${candidate.category}' not found in category matrix.`
     );
-
-    // Weights
-    const weights = job.weights;
-
-    // Compute the weighted sum
-    const matchScore =
-      (categoryScore * weights.category +
-        companyScoreNormalized * weights.companyScore +
-        seniorityScore * weights.seniorityLevel) /
-      (weights.category + weights.companyScore + weights.seniorityLevel);
-
-    // Prepare match details for breakdown
-    const matchDetails = {
-      categoryScore: categoryScore,
-      companyScoreNormalized: companyScoreNormalized,
-      seniorityScore: seniorityScore,
-      weightedCategoryScore: categoryScore * weights.category,
-      weightedCompanyScore: companyScoreNormalized * weights.companyScore,
-      weightedSeniorityScore: seniorityScore * weights.seniorityLevel,
-      totalWeight: weights.category + weights.companyScore + weights.seniorityLevel,
-    };
-
-    return { matchScore: matchScore * 100, matchDetails };
+    return { matchScore: 0, matchDetails: {} };
   }
+
+  // Get the category score between the candidate and the job
+  const categoryScore = candidateCategories[job.category] || 0;
+
+  // Normalize the company score
+  const companyScoreNormalized = normalizeCompanyScore(candidate.companyScore);
+
+  // Calculate seniority score based on distance
+  const seniorityScore = calculateSeniorityScore(
+    candidate.seniorityLevel,
+    job.seniorityLevelTarget
+  );
+
+  // Weights
+  const weights = job.weights;
+
+  // Compute weighted scores
+  const weightedCategoryScore = categoryScore * weights.category;
+  const weightedCompanyScore = companyScoreNormalized * weights.companyScore;
+  const weightedSeniorityScore = seniorityScore * weights.seniorityLevel;
+
+  // Total weighted score
+  const totalWeightedScore =
+    weightedCategoryScore + weightedCompanyScore + weightedSeniorityScore;
+
+  // Total weight (maximum possible weighted score)
+  const totalWeight = weights.category + weights.companyScore + weights.seniorityLevel;
+
+  // Compute the total match score as a percentage
+  const matchScore = (totalWeightedScore / totalWeight) * 100;
+
+  // Calculate percentage contributions
+  const percentageCategory = (weightedCategoryScore / totalWeightedScore) * 100;
+  const percentageCompany = (weightedCompanyScore / totalWeightedScore) * 100;
+  const percentageSeniority = (weightedSeniorityScore / totalWeightedScore) * 100;
+
+  // Prepare match details for breakdown
+  const matchDetails = {
+    categoryScore,
+    companyScoreNormalized,
+    seniorityScore,
+    weightedCategoryScore,
+    weightedCompanyScore,
+    weightedSeniorityScore,
+    totalWeightedScore,
+    totalWeight,
+    percentageCategory,
+    percentageCompany,
+    percentageSeniority,
+  };
+
+  return { matchScore, matchDetails };
+}
+
 
   return (
     <div>
@@ -456,8 +477,7 @@ ${jobDescription}
                   (selectedCandidate.matchDetails.weightedCategoryScore /
                     selectedCandidate.matchDetails.totalWeight) *
                   100
-                ).toFixed(2)}
-                % of total)
+                ).toFixed(0)} points)
                 <br />
                 <strong>Company Score:</strong>{' '}
                 {(selectedCandidate.matchDetails.companyScoreNormalized * 100).toFixed(2)}% (
@@ -465,8 +485,7 @@ ${jobDescription}
                   (selectedCandidate.matchDetails.weightedCompanyScore /
                     selectedCandidate.matchDetails.totalWeight) *
                   100
-                ).toFixed(2)}
-                % of total)
+                ).toFixed(0)} points)
                 <br />
                 <strong>Seniority Score:</strong>{' '}
                 {(selectedCandidate.matchDetails.seniorityScore * 100).toFixed(2)}% (
@@ -474,8 +493,7 @@ ${jobDescription}
                   (selectedCandidate.matchDetails.weightedSeniorityScore /
                     selectedCandidate.matchDetails.totalWeight) *
                   100
-                ).toFixed(2)}
-                % of total)
+                ).toFixed(0)} points)
               </Typography>
             </>
           )}

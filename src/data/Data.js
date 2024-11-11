@@ -1203,7 +1203,7 @@ export const softwareEngineerCandidates = [
     company: 'Sela Group',
     companyScore: 3,
     currentPosition: 'Frontend Developer',
-    seniorityLevel: 3,
+    seniorityLevel: 2,
     yearsOfExperience: 10,
     educationQuality: 3,
     education: 'Computer Software Engineering (Ort Braude College)',
@@ -1289,7 +1289,22 @@ export const softwareEngineerCandidates = [
     "phone": "",
     "email": "",
     "linkedin": ""
-  }
+  },
+  {
+  "id": 14,
+  "name": "Mariya Fain",
+  "category": "Frontend Development",
+  "company": "Specter group",
+  "companyScore": 2,
+  "currentPosition": "Frontend Developer",
+  "seniorityLevel": 1,
+  "yearsOfExperience": 2,
+  "educationQuality": 3,
+  "education": "Python Institute (Certificate in Python programming language), Volga State University of Telecommunications and Informatics (Diploma in Engineering Design)",
+  "phone": "",
+  "email": "",
+  "linkedin": ""
+}
 ];
 
 // src/data/Data.js
@@ -1303,8 +1318,8 @@ export const softwareEngineerJobs = [
     category: 'Frontend Development',
     seniorityLevelTarget: 1, // Target seniority level
     weights: {
-      category: 5,
-      companyScore: 2,
+      category: 4,
+      companyScore: 1,
       seniorityLevel: 3,
     },
     description: `We are looking for a Junior Frontend Developer to join our team. The ideal candidate has a strong foundation in HTML, CSS, and JavaScript, and is eager to learn and grow in a collaborative environment.`,

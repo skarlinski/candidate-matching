@@ -245,18 +245,28 @@ function calculateMatchScore(candidate, job) {
 
   // Weights
   const weights = job.weights;
+// Desired total maximum points (e.g., 100)
 
-  // Compute weighted scores
+// Scaling factor to scale weights to the desired total points
+
   const weightedCategoryScore = categoryScore * weights.category;
   const weightedCompanyScore = companyScoreNormalized * weights.companyScore;
   const weightedSeniorityScore = seniorityScore * weights.seniorityLevel;
 
+const totalWeight = weights.category + weights.companyScore + weights.seniorityLevel;
+  const desiredTotalPoints = 100;
+
+
+  const scalingFactor = desiredTotalPoints / totalWeight;
+  // Compute weighted scores
+  // Maximum possible points for each criterion
+  const maxPointsCategory = weights.category * scalingFactor;
+  const maxPointsCompany = weights.companyScore * scalingFactor;
+  const maxPointsSeniority = weights.seniorityLevel * scalingFactor;
+
   // Total weighted score
   const totalWeightedScore =
     weightedCategoryScore + weightedCompanyScore + weightedSeniorityScore;
-
-  // Total weight (maximum possible weighted score)
-  const totalWeight = weights.category + weights.companyScore + weights.seniorityLevel;
 
   // Compute the total match score as a percentage
   const matchScore = (totalWeightedScore / totalWeight) * 100;
@@ -274,6 +284,9 @@ function calculateMatchScore(candidate, job) {
     weightedCategoryScore,
     weightedCompanyScore,
     weightedSeniorityScore,
+    maxPointsCategory,
+    maxPointsCompany,
+    maxPointsSeniority,
     totalWeightedScore,
     totalWeight,
     percentageCategory,
@@ -477,7 +490,7 @@ function calculateMatchScore(candidate, job) {
                   (selectedCandidate.matchDetails.weightedCategoryScore /
                     selectedCandidate.matchDetails.totalWeight) *
                   100
-                ).toFixed(0)} points)
+                ).toFixed(0)} / {selectedCandidate.matchDetails.maxPointsCategory} points)
                 <br />
                 <strong>Company Score:</strong>{' '}
                 {(selectedCandidate.matchDetails.companyScoreNormalized * 100).toFixed(2)}% (
@@ -485,7 +498,7 @@ function calculateMatchScore(candidate, job) {
                   (selectedCandidate.matchDetails.weightedCompanyScore /
                     selectedCandidate.matchDetails.totalWeight) *
                   100
-                ).toFixed(0)} points)
+                ).toFixed(0)} / {selectedCandidate.matchDetails.maxPointsCompany} points)
                 <br />
                 <strong>Seniority Score:</strong>{' '}
                 {(selectedCandidate.matchDetails.seniorityScore * 100).toFixed(2)}% (
@@ -493,7 +506,7 @@ function calculateMatchScore(candidate, job) {
                   (selectedCandidate.matchDetails.weightedSeniorityScore /
                     selectedCandidate.matchDetails.totalWeight) *
                   100
-                ).toFixed(0)} points)
+                ).toFixed(0)} / {selectedCandidate.matchDetails.maxPointsSeniority} points )
               </Typography>
             </>
           )}

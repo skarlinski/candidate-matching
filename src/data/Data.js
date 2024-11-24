@@ -1290,21 +1290,7 @@ export const softwareEngineerCandidates = [
     "email": "",
     "linkedin": ""
   },
-  {
-  "id": 14,
-  "name": "Mariya Fain",
-  "category": "Frontend Development",
-  "company": "Specter group",
-  "companyScore": 2,
-  "currentPosition": "Frontend Developer",
-  "seniorityLevel": 1,
-  "yearsOfExperience": 2,
-  "educationQuality": 3,
-  "education": "Python Institute (Certificate in Python programming language), Volga State University of Telecommunications and Informatics (Diploma in Engineering Design)",
-  "phone": "",
-  "email": "",
-  "linkedin": ""
-}
+  
 ];
 
 // src/data/Data.js

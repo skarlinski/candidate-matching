@@ -20,8 +20,8 @@ function AddItemModal({ open, onClose, onAddCandidate, onAddJob }) {
   const [inputText, setInputText] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [loading, setLoading] = useState(false);
-  const [newItemPreview, setNewItemPreview] = useState(null); // State to hold the new item preview
-  const [errorMessage, setErrorMessage] = useState('');
+  const [parsedData, setParsedData] = useState(null);
+  const [step, setStep] = useState(1);
 
   const handleAddItem = async () => {
     if (!inputText || !apiKey) {
@@ -30,7 +30,6 @@ function AddItemModal({ open, onClose, onAddCandidate, onAddJob }) {
     }
 
     setLoading(true);
-    setErrorMessage('');
 
     try {
       // Prepare the request to OpenAI API
@@ -95,6 +94,7 @@ The json structure, do not deviate from it:
     currentPosition: 'Frontend Developer',
     seniorityLevel: 2,
     yearsOfExperience: 3.5,
+    hasManagementExperience: false,
     educationQuality: 1,
     education: 'Web Development Bootcamp (Coding Academy Israel)',
     phone: '+1-555-0108',
@@ -165,9 +165,9 @@ ${inputText}
           jsonString = jsonMatch[1];
         }
 
-        let newItem;
+        let parsed;
         try {
-          newItem = JSON.parse(jsonString);
+          parsed = JSON.parse(jsonString);
         } catch (error) {
           alert("Could not parse the assistant's reply as JSON.");
           console.error('Error parsing JSON:', error);
@@ -176,53 +176,43 @@ ${inputText}
         }
 
         // Assign a new unique ID if not provided
-        newItem.id = Date.now();
+        parsed.id = Date.now();
 
-        // If itemType is candidate, show preview before adding
-        if (itemType === 'candidate') {
-          setNewItemPreview(newItem);
-        } else {
-          // For jobs, add directly
-          onAddJob(newItem);
-
-          // Reset form and close modal
-          setInputText('');
-          setApiKey('');
-          setItemType('candidate');
-          onClose();
-        }
+        setParsedData(parsed);
+        setStep(2); // Move to the preview step
       } else {
-        setErrorMessage(`Error: ${data.error.message}`);
+        alert(`Error: ${data.error.message}`);
       }
     } catch (error) {
       console.error('Error adding item:', error);
-      setErrorMessage('An error occurred while adding the item.');
+      alert('An error occurred while adding the item.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleConfirmAddCandidate = () => {
-    onAddCandidate(newItemPreview);
+  const handleConfirmAdd = () => {
+    if (itemType === 'candidate') {
+      onAddCandidate(parsedData);
+    } else {
+      onAddJob(parsedData);
+    }
 
     // Reset form and close modal
     setInputText('');
     setApiKey('');
     setItemType('candidate');
-    setNewItemPreview(null);
+    setParsedData(null);
+    setStep(1);
     onClose();
-  };
-
-  const handleCancelAddCandidate = () => {
-    // Reset the preview and go back to input step
-    setNewItemPreview(null);
   };
 
   return (
     <Modal
       open={open}
       onClose={() => {
-        setNewItemPreview(null);
+        setStep(1);
+        setParsedData(null);
         onClose();
       }}
       aria-labelledby="add-item-modal-title"
@@ -242,7 +232,7 @@ ${inputText}
           p: 4,
         }}
       >
-        {!newItemPreview ? (
+        {step === 1 && (
           <>
             <Typography id="add-item-modal-title" variant="h5" component="h2">
               Add {itemType === 'candidate' ? 'Candidate' : 'Job'}
@@ -295,11 +285,6 @@ ${inputText}
               </Link>
               .
             </Typography>
-            {errorMessage && (
-              <Typography color="error" sx={{ mt: 2 }}>
-                {errorMessage}
-              </Typography>
-            )}
             <Button
               variant="contained"
               color="primary"
@@ -310,77 +295,79 @@ ${inputText}
               {loading ? <CircularProgress size={24} /> : 'Submit'}
             </Button>
           </>
-        ) : (
-          // Show preview of the candidate
+        )}
+        {step === 2 && parsedData && (
           <>
             <Typography id="preview-modal-title" variant="h5" component="h2">
-              Preview Candidate Information
+              Preview {itemType === 'candidate' ? 'Candidate' : 'Job'} Information
             </Typography>
             <Typography
               id="preview-modal-description"
               sx={{ mt: 2, fontSize: '16px' }}
             >
-              Please review the candidate information below before adding.
+              Please review the {itemType} information below before adding.
             </Typography>
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="subtitle1">
-                <strong>Name:</strong> {newItemPreview.name}
-              </Typography>
-              <Typography variant="subtitle1">
-                <strong>Category:</strong> {newItemPreview.category}
-              </Typography>
-              <Typography variant="subtitle1">
-                <strong>Current Position:</strong> {newItemPreview.currentPosition}
-              </Typography>
-              <Typography variant="subtitle1">
-                <strong>Company:</strong> {newItemPreview.company}
-              </Typography>
-              <Typography variant="subtitle1">
-                <strong>Company Score:</strong> {newItemPreview.companyScore}
-              </Typography>
-              <Typography variant="subtitle1">
-                <strong>Seniority Level:</strong> {newItemPreview.seniorityLevel}
-              </Typography>
-              <Typography variant="subtitle1">
-                <strong>Years of Experience:</strong> {newItemPreview.yearsOfExperience}
-              </Typography>
-              <Typography variant="subtitle1">
+            {itemType === 'candidate' ? (
+              <Box sx={{ mt: 2 }}>
+                <strong>Name:</strong> {parsedData.name}
+                <br />
+                <strong>Category:</strong> {parsedData.category}
+                <br />
+                <strong>Current Position:</strong> {parsedData.currentPosition}
+                <br />
+                <strong>Company:</strong> {parsedData.company}
+                <br />
+                <strong>Company Score:</strong> {parsedData.companyScore}{' '}
+                {getCompanyScoreExplanation(parsedData.companyScore)}
+                <br />
+                <strong>Seniority Level:</strong> {parsedData.seniorityLevel}{' '}
+                {getSeniorityLevelExplanation(parsedData.seniorityLevel)}
+                <br />
+                <strong>Years of Experience:</strong> {parsedData.yearsOfExperience}
+                <br />
                 <strong>Has Management Experience:</strong>{' '}
-                {newItemPreview.hasManagementExperience ? 'Yes' : 'No'}
-              </Typography>
-              <Typography variant="subtitle1">
-                <strong>Education Quality:</strong> {newItemPreview.educationQuality}
-              </Typography>
-              <Typography variant="subtitle1">
-                <strong>Education:</strong> {newItemPreview.education}
-              </Typography>
-              <Typography variant="subtitle1">
-                <strong>Phone:</strong> {newItemPreview.phone}
-              </Typography>
-              <Typography variant="subtitle1">
-                <strong>Email:</strong> {newItemPreview.email}
-              </Typography>
-              <Typography variant="subtitle1">
+                {parsedData.hasManagementExperience ? 'Yes' : 'No'}
+                <br />
+                <strong>Education Quality:</strong> {parsedData.educationQuality}{' '}
+                {getEducationQualityExplanation(parsedData.educationQuality)}
+                <br />
+                <strong>Education:</strong> {parsedData.education}
+                <br />
+                <strong>Phone:</strong> {parsedData.phone}
+                <br />
+                <strong>Email:</strong> {parsedData.email}
+                <br />
                 <strong>LinkedIn:</strong>{' '}
-                <Link href={newItemPreview.linkedin} target="_blank" rel="noopener">
-                  {newItemPreview.linkedin}
+                <Link href={parsedData.linkedin} target="_blank" rel="noopener">
+                  {parsedData.linkedin}
                 </Link>
-              </Typography>
-            </Box>
-            <Box sx={{ mt: 4, textAlign: 'right' }}>
+              </Box>
+            ) : (
+              <Box sx={{ mt: 2 }}>
+                <strong>Title:</strong> {parsedData.title}
+                <br />
+                <strong>Category:</strong> {parsedData.category}
+                <br />
+                <strong>Seniority Level Target:</strong> {parsedData.seniorityLevelTarget}
+                <br />
+                <strong>Weights:</strong>{' '}
+                {`Category: ${parsedData.weights.category}, Company Score: ${parsedData.weights.companyScore}, Seniority Level: ${parsedData.weights.seniorityLevel}`}
+                <br />
+                <strong>Description:</strong> {parsedData.description}
+              </Box>
+            )}
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
               <Button
-                variant="outlined"
-                onClick={handleCancelAddCandidate}
+                onClick={() => {
+                  setStep(1);
+                  setParsedData(null);
+                }}
                 sx={{ mr: 2 }}
               >
-                Cancel
+                Back
               </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleConfirmAddCandidate}
-              >
-                Add Candidate
+              <Button variant="contained" color="primary" onClick={handleConfirmAdd}>
+                Confirm and Add
               </Button>
             </Box>
           </>
@@ -388,6 +375,40 @@ ${inputText}
       </Box>
     </Modal>
   );
+}
+
+// Helper functions to get explanations
+function getCompanyScoreExplanation(score) {
+  const explanations = {
+    1: '(Non-technological company, or low reputation)',
+    2: '(Small, unknown tech company, contractors companies, professional services)',
+    3: '(Small, unproven startups)',
+    4: '(Promising startups, large startups, well-regarded companies)',
+    5: '(Leading global tech company like Microsoft, Waze, Google, Elastic)',
+  };
+  return explanations[score] || '';
+}
+
+function getSeniorityLevelExplanation(level) {
+  const explanations = {
+    1: '- Junior',
+    2: '- Mid-level',
+    3: '- Senior',
+    4: '- Lead',
+    5: '- Executive (e.g., CTO)',
+  };
+  return explanations[level] || '';
+}
+
+function getEducationQualityExplanation(quality) {
+  const explanations = {
+    1: '(No education)',
+    2: '(Bootcamp, short course)',
+    3: "(Bachelor's degree from a standard university)",
+    4: "(Bachelor's degree from a good university)",
+    5: '(Advanced degree from a top-tier university, or bachelor\'s with honors)',
+  };
+  return explanations[quality] || '';
 }
 
 export default AddItemModal;

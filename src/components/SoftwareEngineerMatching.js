@@ -22,8 +22,6 @@ import {
   Grid,
   Card,
   CardContent,
-  TextField,
-  Link,
   CircularProgress,
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
@@ -40,6 +38,8 @@ import {
   softwareCategoryMatrix,
 } from '../data/Data';
 
+import AddItemModal from './AddItemModal';
+
 function SoftwareEngineerMatching() {
   const [selectedJobId, setSelectedJobId] = useState('');
   const [selectedJob, setSelectedJob] = useState(null);
@@ -47,16 +47,17 @@ function SoftwareEngineerMatching() {
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [openExplanationModal, setOpenExplanationModal] = useState(false);
   const [openNextStepsModal, setOpenNextStepsModal] = useState(false);
-  const [openAddJobModal, setOpenAddJobModal] = useState(false); // State for Add Job modal
-  const [jobDescription, setJobDescription] = useState('');
-  const [apiKey, setApiKey] = useState('');
   const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [candidates, setCandidates] = useState([]);
+  const [openAddItemModal, setOpenAddItemModal] = useState(false);
 
-  // Load jobs from localStorage on component mount
+  // Load jobs and candidates from localStorage on component mount
   useEffect(() => {
     const storedJobs = JSON.parse(localStorage.getItem('customJobs')) || [];
     setJobs([...initialJobs, ...storedJobs]);
+
+    const storedCandidates = JSON.parse(localStorage.getItem('customCandidates')) || [];
+    setCandidates([...softwareEngineerCandidates, ...storedCandidates]);
   }, []);
 
   const handleJobChange = (event) => {
@@ -67,7 +68,7 @@ function SoftwareEngineerMatching() {
     setSelectedJob(job);
 
     // Calculate match scores
-    const candidatesWithScores = softwareEngineerCandidates.map((candidate) => {
+    const candidatesWithScores = candidates.map((candidate) => {
       const { matchScore, matchDetails } = calculateMatchScore(candidate, job);
       return { ...candidate, matchScore, matchDetails };
     });
@@ -78,118 +79,24 @@ function SoftwareEngineerMatching() {
     setSortedCandidates(candidatesWithScores);
   };
 
-  // Function to open the Add Job modal
-  const handleOpenAddJobModal = () => {
-    setOpenAddJobModal(true);
+  // Function to handle adding a new candidate
+  const handleAddCandidate = (newCandidate) => {
+    const updatedCandidates = [...candidates, newCandidate];
+    setCandidates(updatedCandidates);
+    // Store custom candidates in localStorage
+    const customCandidates = updatedCandidates.filter((candidate) => candidate.id >= 1000);
+    localStorage.setItem('customCandidates', JSON.stringify(customCandidates));
+    alert('Candidate added successfully.');
   };
 
-  // Function to handle Add Job form submission
-  const handleAddJob = async () => {
-    if (!jobDescription || !apiKey) {
-      alert('Please provide both the job description and API key.');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      // Prepare the request to OpenAI API
-// Prepare the request to OpenAI API
-const response = await fetch('https://api.openai.com/v1/chat/completions', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${apiKey}`,
-  },
-  body: JSON.stringify({
-    model: 'gpt-4o',
-    messages: [
-      {
-        role: 'system',
-        content:
-          'You are an assistant that helps parse job descriptions into structured data.',
-      },
-      {
-        role: 'user',
-        content: `Please parse the following job description into a JSON object with the following fields:
-
-- **id**: unique identifier (use current timestamp)
-- **title**
-- **category**: standardized, one of: 'Frontend Development', 'Backend Development', 'DevOps', 'Embedded Systems', 'Software Engineering', 'Leadership'
-- **seniorityLevelTarget**: integer from 1 to 5
-- **weights**: { category, companyScore, seniorityLevel } (numbers that sum to 10)
-- **description**
-
-**Important Instructions**:
-- Only output the JSON object.
-- Enclose the JSON within a code block like so:
-\`\`\`json
-{ ... }
-\`\`\`
-- Do not include any additional text or explanations.
-
-Job Description:
-${jobDescription}
-`,
-      },
-    ],
-    max_tokens: 500,
-    temperature: 0,
-  }),
-});
-
-      const data = await response.json();
-
-      if (response.ok) {
-  // Extract the assistant's reply
-  const assistantReply = data.choices[0].message.content.trim();
-
-  // Use a regular expression to extract JSON from code block
-  const jsonMatch = assistantReply.match(/```json\s*([\s\S]*?)\s*```/);
-
-  let newJob;
-
-  if (jsonMatch && jsonMatch[1]) {
-    // Parse the JSON
-    try {
-      newJob = JSON.parse(jsonMatch[1]);
-    } catch (error) {
-      alert('Could not parse the assistant\'s reply as JSON.');
-      console.error('Error parsing JSON:', error);
-      setLoading(false);
-      return;
-    }
-  } else {
-    alert('The assistant did not return the JSON in the expected format.');
-    console.error('Assistant reply:', assistantReply);
-    setLoading(false);
-    return;
-  }
-
-  // Assign a new unique ID if not provided
-  newJob.id = Date.now();
-
-  // Update the jobs list and localStorage
-  const updatedJobs = [...jobs, newJob];
-  setJobs(updatedJobs);
-
-  // Store custom jobs separately in localStorage (with id >= 1000)
-  const customJobs = updatedJobs.filter((job) => job.id >= 1000);
-  localStorage.setItem('customJobs', JSON.stringify(customJobs));
-
-  // Reset form and close modal
-  setJobDescription('');
-  setApiKey('');
-  setOpenAddJobModal(false);
-} else {
-  alert(`Error: ${data.error.message}`);
-}
-    } catch (error) {
-      console.error('Error adding job:', error);
-      alert('An error occurred while adding the job.');
-    } finally {
-      setLoading(false);
-    }
+  // Function to handle adding a new job
+  const handleAddJob = (newJob) => {
+    const updatedJobs = [...jobs, newJob];
+    setJobs(updatedJobs);
+    // Store custom jobs in localStorage
+    const customJobs = updatedJobs.filter((job) => job.id >= 1000);
+    localStorage.setItem('customJobs', JSON.stringify(customJobs));
+    alert('Job added successfully.');
   };
 
   // Normalize company score (higher is better)
@@ -220,83 +127,82 @@ ${jobDescription}
   }
 
   // Calculate the match score and provide match details
-// Calculate the match score and provide match details
-function calculateMatchScore(candidate, job) {
-  // Get the candidate's category scores
-  const candidateCategories = softwareCategoryMatrix[candidate.category];
-  if (!candidateCategories) {
-    console.error(
-      `Candidate category '${candidate.category}' not found in category matrix.`
+  function calculateMatchScore(candidate, job) {
+    // Get the candidate's category scores
+    const candidateCategories = softwareCategoryMatrix[candidate.category];
+    if (!candidateCategories) {
+      console.error(
+        `Candidate category '${candidate.category}' not found in category matrix.`
+      );
+      return { matchScore: 0, matchDetails: {} };
+    }
+
+    // Get the category score between the candidate and the job
+    const categoryScore = candidateCategories[job.category] || 0;
+
+    // Normalize the company score
+    const companyScoreNormalized = normalizeCompanyScore(candidate.companyScore);
+
+    // Calculate seniority score based on distance
+    const seniorityScore = calculateSeniorityScore(
+      candidate.seniorityLevel,
+      job.seniorityLevelTarget
     );
-    return { matchScore: 0, matchDetails: {} };
+
+    // Weights
+    const weights = job.weights;
+
+    // Compute weighted scores
+    const weightedCategoryScore = categoryScore * weights.category;
+    const weightedCompanyScore = companyScoreNormalized * weights.companyScore;
+    const weightedSeniorityScore = seniorityScore * weights.seniorityLevel;
+
+    // Total weighted score
+    const totalWeightedScore =
+      weightedCategoryScore + weightedCompanyScore + weightedSeniorityScore;
+
+    // Total weight (maximum possible weighted score)
+    const totalWeight = weights.category + weights.companyScore + weights.seniorityLevel;
+
+    // Compute the total match score as a percentage
+    const matchScore = (totalWeightedScore / totalWeight) * 100;
+
+    // Desired total maximum points (e.g., 100)
+    const desiredTotalPoints = 100;
+
+    // Scaling factor to scale weights to the desired total points
+    const scalingFactor = desiredTotalPoints / totalWeight;
+
+    // Maximum possible points for each criterion
+    const maxPointsCategory = weights.category * scalingFactor;
+    const maxPointsCompany = weights.companyScore * scalingFactor;
+    const maxPointsSeniority = weights.seniorityLevel * scalingFactor;
+
+    // Points achieved for each criterion
+    const pointsCategory = categoryScore * maxPointsCategory;
+    const pointsCompany = companyScoreNormalized * maxPointsCompany;
+    const pointsSeniority = seniorityScore * maxPointsSeniority;
+
+    // Prepare match details for breakdown
+    const matchDetails = {
+      categoryScore,
+      companyScoreNormalized,
+      seniorityScore,
+      weightedCategoryScore,
+      weightedCompanyScore,
+      weightedSeniorityScore,
+      maxPointsCategory,
+      maxPointsCompany,
+      maxPointsSeniority,
+      pointsCategory,
+      pointsCompany,
+      pointsSeniority,
+      totalWeightedScore,
+      totalWeight,
+    };
+
+    return { matchScore, matchDetails };
   }
-
-  // Get the category score between the candidate and the job
-  const categoryScore = candidateCategories[job.category] || 0;
-
-  // Normalize the company score
-  const companyScoreNormalized = normalizeCompanyScore(candidate.companyScore);
-
-  // Calculate seniority score based on distance
-  const seniorityScore = calculateSeniorityScore(
-    candidate.seniorityLevel,
-    job.seniorityLevelTarget
-  );
-
-  // Weights
-  const weights = job.weights;
-// Desired total maximum points (e.g., 100)
-
-// Scaling factor to scale weights to the desired total points
-
-  const weightedCategoryScore = categoryScore * weights.category;
-  const weightedCompanyScore = companyScoreNormalized * weights.companyScore;
-  const weightedSeniorityScore = seniorityScore * weights.seniorityLevel;
-
-const totalWeight = weights.category + weights.companyScore + weights.seniorityLevel;
-  const desiredTotalPoints = 100;
-
-
-  const scalingFactor = desiredTotalPoints / totalWeight;
-  // Compute weighted scores
-  // Maximum possible points for each criterion
-  const maxPointsCategory = weights.category * scalingFactor;
-  const maxPointsCompany = weights.companyScore * scalingFactor;
-  const maxPointsSeniority = weights.seniorityLevel * scalingFactor;
-
-  // Total weighted score
-  const totalWeightedScore =
-    weightedCategoryScore + weightedCompanyScore + weightedSeniorityScore;
-
-  // Compute the total match score as a percentage
-  const matchScore = (totalWeightedScore / totalWeight) * 100;
-
-  // Calculate percentage contributions
-  const percentageCategory = (weightedCategoryScore / totalWeightedScore) * 100;
-  const percentageCompany = (weightedCompanyScore / totalWeightedScore) * 100;
-  const percentageSeniority = (weightedSeniorityScore / totalWeightedScore) * 100;
-
-  // Prepare match details for breakdown
-  const matchDetails = {
-    categoryScore,
-    companyScoreNormalized,
-    seniorityScore,
-    weightedCategoryScore,
-    weightedCompanyScore,
-    weightedSeniorityScore,
-    maxPointsCategory,
-    maxPointsCompany,
-    maxPointsSeniority,
-    totalWeightedScore,
-    totalWeight,
-    percentageCategory,
-    percentageCompany,
-    percentageSeniority,
-  };
-
-  return { matchScore, matchDetails };
-}
-
 
   return (
     <div>
@@ -326,10 +232,10 @@ const totalWeight = weights.category + weights.companyScore + weights.seniorityL
           <Button
             variant="outlined"
             startIcon={<AddIcon />}
-            onClick={handleOpenAddJobModal}
+            onClick={() => setOpenAddItemModal(true)}
             style={{ marginRight: '10px' }}
           >
-            Add Job
+            Add Job / Candidate
           </Button>
           <Button
             variant="outlined"
@@ -486,106 +392,35 @@ const totalWeight = weights.category + weights.companyScore + weights.seniorityL
                 <br />
                 <strong>Category Score:</strong>{' '}
                 {(selectedCandidate.matchDetails.categoryScore * 100).toFixed(2)}% (
-                {(
-                  (selectedCandidate.matchDetails.weightedCategoryScore /
-                    selectedCandidate.matchDetails.totalWeight) *
-                  100
-                ).toFixed(0)} / {selectedCandidate.matchDetails.maxPointsCategory} points)
+                {selectedCandidate.matchDetails.pointsCategory.toFixed(2)}/
+                {selectedCandidate.matchDetails.maxPointsCategory.toFixed(2)} points)
                 <br />
                 <strong>Company Score:</strong>{' '}
                 {(selectedCandidate.matchDetails.companyScoreNormalized * 100).toFixed(2)}% (
-                {(
-                  (selectedCandidate.matchDetails.weightedCompanyScore /
-                    selectedCandidate.matchDetails.totalWeight) *
-                  100
-                ).toFixed(0)} / {selectedCandidate.matchDetails.maxPointsCompany} points)
+                {selectedCandidate.matchDetails.pointsCompany.toFixed(2)}/
+                {selectedCandidate.matchDetails.maxPointsCompany.toFixed(2)} points)
                 <br />
                 <strong>Seniority Score:</strong>{' '}
                 {(selectedCandidate.matchDetails.seniorityScore * 100).toFixed(2)}% (
-                {(
-                  (selectedCandidate.matchDetails.weightedSeniorityScore /
-                    selectedCandidate.matchDetails.totalWeight) *
-                  100
-                ).toFixed(0)} / {selectedCandidate.matchDetails.maxPointsSeniority} points )
+                {selectedCandidate.matchDetails.pointsSeniority.toFixed(2)}/
+                {selectedCandidate.matchDetails.maxPointsSeniority.toFixed(2)} points)
               </Typography>
             </>
           )}
         </Box>
       </Modal>
 
-      {/* Add Job Modal */}
-      <Modal
-        open={openAddJobModal}
-        onClose={() => setOpenAddJobModal(false)}
-        aria-labelledby="add-job-modal-title"
-        aria-describedby="add-job-modal-description"
-      >
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 600,
-            maxHeight: '90vh',
-            overflowY: 'auto',
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <Typography id="add-job-modal-title" variant="h5" component="h2">
-            Add New Job
-          </Typography>
-          <Typography
-            id="add-job-modal-description"
-            sx={{ mt: 2, fontSize: '16px' }}
-          >
-            Please enter the job description and your OpenAI API key.
-          </Typography>
-          <TextField
-            label="Job Description"
-            multiline
-            rows={6}
-            fullWidth
-            variant="outlined"
-            value={jobDescription}
-            onChange={(e) => setJobDescription(e.target.value)}
-            style={{ marginTop: '20px' }}
-          />
-          <TextField
-            label="OpenAI API Key"
-            type="password"
-            fullWidth
-            variant="outlined"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            style={{ marginTop: '20px' }}
-          />
-          <Typography variant="body2" style={{ marginTop: '10px' }}>
-            You can get your API key from{' '}
-            <Link
-              href="https://platform.openai.com/account/api-keys"
-              target="_blank"
-              rel="noopener"
-            >
-              OpenAI API Keys
-            </Link>
-            .
-          </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleAddJob}
-            style={{ marginTop: '20px' }}
-            disabled={loading}
-          >
-            {loading ? <CircularProgress size={24} /> : 'Submit'}
-          </Button>
-        </Box>
-      </Modal>
-
+      {/* Add Item Modal */}
      
+<AddItemModal
+  open={openAddItemModal}
+  onClose={() => setOpenAddItemModal(false)}
+  onAddCandidate={handleAddCandidate}
+  onAddJob={handleAddJob}
+  selectedJob={selectedJob}
+  calculateMatchScore={calculateMatchScore}
+/>
+
       {/* Explanation Modal */}
       <Modal
         open={openExplanationModal}
@@ -711,6 +546,5 @@ const totalWeight = weights.category + weights.companyScore + weights.seniorityL
     </div>
   );
 }
-
 
 export default SoftwareEngineerMatching;

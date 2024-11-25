@@ -323,8 +323,7 @@ ${inputText}
                 <strong>Seniority Level:</strong> {parsedData.seniorityLevel}{' '}
                 {getSeniorityLevelExplanation(parsedData.seniorityLevel)}
                 <br />
-                <strong>Years of Experience:</strong> {parsedData.yearsOfExperience}
-                <br />
+
                 <strong>Has Management Experience:</strong>{' '}
                 {parsedData.hasManagementExperience ? 'Yes' : 'No'}
                 <br />

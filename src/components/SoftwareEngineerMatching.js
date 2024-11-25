@@ -368,9 +368,6 @@ function SoftwareEngineerMatching() {
                 <br />
                 <strong>Seniority Level:</strong> {selectedCandidate.seniorityLevel}
                 <br />
-                <strong>Years of Experience:</strong>{' '}
-                {selectedCandidate.yearsOfExperience}
-                <br />
                 <strong>Education:</strong> {selectedCandidate.education}
                 <br />
                 <strong>Phone:</strong> {selectedCandidate.phone}

@@ -616,41 +616,7 @@ export const candidates = [
         "email": "dana.meller@example.com",
         "linkedin": "https://www.linkedin.com/in/dana-meller-110947194/"
     },
-   
-{
-    "id": 1732544760211,
-    "name": "Itay Saferstein",
-    "contactInfo": {
-        "phone": null,
-        "email": null,
-        "linkedin": null
-    },
-    "category": "Frontend Development",
-    "currentPosition": "Junior Frontend Developer",
-    "company": "KNAPP",
-    "companyScore": 2,
-    "seniorityLevel": 1,
-    "yearsOfExperience": 1.5,
-    "hasManagementExperience": false,
-    "educationQuality": 1,
-    "education": null
-},
-{
-    "id": 1732544611806,
-    "name": "Lian Binyamin",
-    "category": "Frontend Development",
-    "company": "Kaltura",
-    "companyScore": 4,
-    "currentPosition": "Junior Frontend Developer",
-    "seniorityLevel": 1,
-    "yearsOfExperience": 3.83,
-    "hasManagementExperience": false,
-    "educationQuality": 3,
-    "education": "Bachelor's degree, Computer Software Engineering (Afeka Tel Aviv Academic College of Engineering)",
-    "phone": null,
-    "email": null,
-    "linkedin": null
-}
+
 
 ]
 

@@ -277,6 +277,7 @@ function SoftwareEngineerMatching() {
               <TableRow>
                 <TableCell>Candidate Name</TableCell>
                 <TableCell>Match Score (%)</TableCell>
+                <TableCell>Category</TableCell>
                 <TableCell>Details</TableCell>
                 <TableCell>Contact</TableCell>
               </TableRow>
@@ -286,6 +287,7 @@ function SoftwareEngineerMatching() {
                 <TableRow key={candidate.id}>
                   <TableCell>{candidate.name}</TableCell>
                   <TableCell>{candidate.matchScore.toFixed(2)}</TableCell>
+                  <TableCell>{candidate.category}</TableCell>
                   <TableCell>
                     <IconButton
                       onClick={() => setSelectedCandidate(candidate)}

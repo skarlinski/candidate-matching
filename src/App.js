@@ -12,9 +12,9 @@ import SoftwareEngineerMatching from './components/SoftwareEngineerMatching';
 function App() {
   return (
     <Router>
-      <AppBar position="static">
+      <AppBar position="static" sx="{{color:blue}}">
         <Toolbar>
-          <Typography variant="h6" component={Link} to="/" sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}>
+          <Typography variant="h6" component={Link} to="/" sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit'}}>
             Candidate Matching Demo
           </Typography>
           <Button color="inherit" component={Link} to="/candidates">Candidates</Button>
@@ -22,7 +22,7 @@ function App() {
           <Button color="inherit" component={Link} to="/software-matching">Matching</Button>
         </Toolbar>
       </AppBar>
-      <div style={{ padding: '20px' }}>
+      <div style={{ padding: '20px', backgroundColor:'rgb(243, 244, 246)'  }}>
         <Routes>
           <Route path="/" element={<SoftwareEngineerMatching />} />
           <Route path="/candidates" element={<Candidates />} />

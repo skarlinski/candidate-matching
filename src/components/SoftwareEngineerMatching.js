@@ -22,13 +22,17 @@ import {
   Grid,
   Card,
   CardContent,
+  CircularProgress,
+  AppBar,
+  Toolbar,
+  Container
 } from '@mui/material';
-import InfoIcon from '@mui/icons-material/Info';
+import InfoIcon from '@mui/icons-material/InfoOutlined';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import ForwardIcon from '@mui/icons-material/Forward';
 import AddIcon from '@mui/icons-material/Add';
-import PhoneIcon from '@mui/icons-material/Phone';
-import EmailIcon from '@mui/icons-material/Email';
+import PhoneIcon from '@mui/icons-material/LocalPhoneOutlined';
+import EmailIcon from '@mui/icons-material/EmailOutlined';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 
 import {
@@ -37,7 +41,7 @@ import {
   softwareCategoryMatrix,
 } from '../data/Data';
 
-import AddItemModal from './AddItemModal';
+import AddItemModal from './AddItemModal'; // Using the modal we created for adding jobs/candidates
 
 function SoftwareEngineerMatching() {
   const [selectedJobId, setSelectedJobId] = useState('');
@@ -204,131 +208,132 @@ function SoftwareEngineerMatching() {
   }
 
   return (
-    <div>
-      <Typography variant="h4" gutterBottom>
-        Software Engineer Matching
-      </Typography>
+    <Box sx={{ backgroundColor: '#F6F7F9', minHeight: '100vh'}}>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Typography variant="h3" gutterBottom sx={{ fontWeight: 'bold' }}>
+          Software Engineer Matching
+        </Typography>
 
-      <Grid container spacing={2} alignItems="center" style={{ marginBottom: '20px' }}>
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth variant="outlined">
-            <InputLabel id="job-select-label">Select Job</InputLabel>
-            <Select
-              labelId="job-select-label"
-              value={selectedJobId}
-              onChange={handleJobChange}
-              label="Select Job"
+        <Grid container spacing={2} alignItems="center" sx={{ mb: 4 }}>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth variant="outlined">
+              <InputLabel id="job-select-label">Select Job</InputLabel>
+              <Select
+                labelId="job-select-label"
+                value={selectedJobId}
+                onChange={handleJobChange}
+                label="Select Job"
+              >
+                {jobs.map((job) => (
+                  <MenuItem key={job.id} value={job.id}>
+                    {job.title}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6} sx={{ textAlign: 'right' }}>
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              onClick={() => setOpenAddItemModal(true)}
+              sx={{ mr: 2, padding:"16px", background: "white" }}
             >
-              {jobs.map((job) => (
-                <MenuItem key={job.id} value={job.id}>
-                  {job.title}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+              Add Job / Candidate
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<HelpOutlineIcon />}
+              onClick={() => setOpenExplanationModal(true)}
+              sx={{ mr: 2, padding:"16px", background: "white" }}
+            >
+              Explanation
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<ForwardIcon />}
+              onClick={() => setOpenNextStepsModal(true)}
+              sx={{ padding:"16px", background: "white" }}
+            >
+              Next Steps
+            </Button>
+          </Grid>
         </Grid>
-        <Grid item xs={12} sm={6} style={{ textAlign: 'right' }}>
-          <Button
-            variant="outlined"
-            startIcon={<AddIcon />}
-            onClick={() => setOpenAddItemModal(true)}
-            style={{ marginRight: '10px' }}
-          >
-            Add Job / Candidate
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<HelpOutlineIcon />}
-            onClick={() => setOpenExplanationModal(true)}
-            style={{ marginRight: '10px' }}
-          >
-            Explanation
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<ForwardIcon />}
-            onClick={() => setOpenNextStepsModal(true)}
-          >
-            Next Steps
-          </Button>
-        </Grid>
-      </Grid>
 
-      {selectedJob && (
-        <Card variant="outlined" style={{ marginBottom: '20px' }}>
-          <CardContent>
-            <Typography variant="h5" component="div">
+        {selectedJob && (
+          <Card variant="outlined" sx={{ mb: 4, p: 2 }}>
+            <Typography variant="h5" component="div" sx={{ fontWeight: 'bold' }}>
               {selectedJob.title}
             </Typography>
             <Typography color="textSecondary" gutterBottom>
               Category: {selectedJob.category}
             </Typography>
-            <Typography variant="body1" style={{ marginTop: '10px' }}>
+            <Typography variant="body1" sx={{ mt: 1 }}>
               {selectedJob.description}
             </Typography>
-          </CardContent>
-        </Card>
-      )}
+          </Card>
+        )}
 
-      {sortedCandidates.length > 0 && (
-        <TableContainer component={Paper}>
-          <Table aria-label="matching table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Candidate Name</TableCell>
-                <TableCell>Match Score (%)</TableCell>
-                <TableCell>Category</TableCell>
-                <TableCell>Details</TableCell>
-                <TableCell>Contact</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {sortedCandidates.map((candidate) => (
-                <TableRow key={candidate.id}>
-                  <TableCell>{candidate.name}</TableCell>
-                  <TableCell>{candidate.matchScore.toFixed(2)}</TableCell>
-                  <TableCell>{candidate.category}</TableCell>
-                  <TableCell>
-                    <IconButton
-                      onClick={() => setSelectedCandidate(candidate)}
-                      aria-label="Details"
-                    >
-                      <InfoIcon color="primary" />
-                    </IconButton>
-                  </TableCell>
-                  <TableCell>
-                    <ButtonGroup variant="text" size="small">
-                      <IconButton
-                        component="a"
-                        href={`tel:${candidate.phone}`}
-                        aria-label="Call"
-                      >
-                        <PhoneIcon color="primary" />
-                      </IconButton>
-                      <IconButton
-                        component="a"
-                        href={`mailto:${candidate.email}`}
-                        aria-label="Email"
-                      >
-                        <EmailIcon color="primary" />
-                      </IconButton>
-                      <IconButton
-                        component="a"
-                        href={candidate.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="LinkedIn Profile"
-                      >
-                        <LinkedInIcon color="primary" />
-                      </IconButton>
-                    </ButtonGroup>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+        {sortedCandidates.length > 0 && (
+          <Paper elevation={0}>
+            <TableContainer>
+              <Table aria-label="matching table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Candidate Name</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Match Score (%)</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Details</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Contact</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {sortedCandidates.map((candidate) => (
+                    <TableRow key={candidate.id}>
+                      <TableCell>{candidate.name}</TableCell>
+                      <TableCell>{candidate.matchScore.toFixed(2)}</TableCell>
+                      <TableCell>
+                        <IconButton
+                          onClick={() => setSelectedCandidate(candidate)}
+                          aria-label="Details"
+                        >
+                          <InfoIcon color="primary" />
+                        </IconButton>
+                      </TableCell>
+                      <TableCell>
+                        <ButtonGroup variant="text" size="small">
+                          <IconButton
+                            component="a"
+                            href={`tel:${candidate.phone}`}
+                            aria-label="Call"
+                          >
+                            <PhoneIcon color="primary" />
+                          </IconButton>
+                          <IconButton
+                            component="a"
+                            href={`mailto:${candidate.email}`}
+                            aria-label="Email"
+                          >
+                            <EmailIcon color="primary" />
+                          </IconButton>
+                          <IconButton
+                            component="a"
+                            href={candidate.linkedin}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="LinkedIn Profile"
+                          >
+                            <LinkedInIcon color="primary" />
+                          </IconButton>
+                        </ButtonGroup>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
+        )}
+      </Container>
 
       {/* Candidate Details Modal */}
       <Modal
@@ -368,6 +373,8 @@ function SoftwareEngineerMatching() {
                 <br />
                 <strong>Seniority Level:</strong> {selectedCandidate.seniorityLevel}
                 <br />
+                <strong>Years of Experience:</strong> {selectedCandidate.yearsOfExperience}
+                <br />
                 <strong>Education:</strong> {selectedCandidate.education}
                 <br />
                 <strong>Phone:</strong> {selectedCandidate.phone}
@@ -378,30 +385,19 @@ function SoftwareEngineerMatching() {
                 <Typography variant="h6">Job Details: {selectedJob.title}</Typography>
                 <strong>Category:</strong> {selectedJob.category}
                 <br />
-                <strong>Target Seniority Level:</strong>{' '}
-                {selectedJob.seniorityLevelTarget}
+                <strong>Target Seniority Level:</strong> {selectedJob.seniorityLevelTarget}
                 <br />
                 <strong>Description:</strong> {selectedJob.description}
                 <br />
                 <br />
                 <Typography variant="h6">Match Score Breakdown</Typography>
-                <strong>Total Match Score:</strong>{' '}
-                {selectedCandidate.matchScore.toFixed(2)}%
+                <strong>Total Match Score:</strong> {selectedCandidate.matchScore.toFixed(2)}%
                 <br />
-                <strong>Category Score:</strong>{' '}
-                {(selectedCandidate.matchDetails.categoryScore * 100).toFixed(2)}% (
-                {selectedCandidate.matchDetails.pointsCategory.toFixed(2)}/
-                {selectedCandidate.matchDetails.maxPointsCategory.toFixed(2)} points)
+                <strong>Category Score:</strong> {(selectedCandidate.matchDetails.categoryScore * 100).toFixed(2)}% ({selectedCandidate.matchDetails.pointsCategory.toFixed(2)}/{selectedCandidate.matchDetails.maxPointsCategory.toFixed(2)} points)
                 <br />
-                <strong>Company Score:</strong>{' '}
-                {(selectedCandidate.matchDetails.companyScoreNormalized * 100).toFixed(2)}% (
-                {selectedCandidate.matchDetails.pointsCompany.toFixed(2)}/
-                {selectedCandidate.matchDetails.maxPointsCompany.toFixed(2)} points)
+                <strong>Company Score:</strong> {(selectedCandidate.matchDetails.companyScoreNormalized * 100).toFixed(2)}% ({selectedCandidate.matchDetails.pointsCompany.toFixed(2)}/{selectedCandidate.matchDetails.maxPointsCompany.toFixed(2)} points)
                 <br />
-                <strong>Seniority Score:</strong>{' '}
-                {(selectedCandidate.matchDetails.seniorityScore * 100).toFixed(2)}% (
-                {selectedCandidate.matchDetails.pointsSeniority.toFixed(2)}/
-                {selectedCandidate.matchDetails.maxPointsSeniority.toFixed(2)} points)
+                <strong>Seniority Score:</strong> {(selectedCandidate.matchDetails.seniorityScore * 100).toFixed(2)}% ({selectedCandidate.matchDetails.pointsSeniority.toFixed(2)}/{selectedCandidate.matchDetails.maxPointsSeniority.toFixed(2)} points)
               </Typography>
             </>
           )}
@@ -409,15 +405,12 @@ function SoftwareEngineerMatching() {
       </Modal>
 
       {/* Add Item Modal */}
-     
-<AddItemModal
-  open={openAddItemModal}
-  onClose={() => setOpenAddItemModal(false)}
-  onAddCandidate={handleAddCandidate}
-  onAddJob={handleAddJob}
-  selectedJob={selectedJob}
-  calculateMatchScore={calculateMatchScore}
-/>
+      <AddItemModal
+        open={openAddItemModal}
+        onClose={() => setOpenAddItemModal(false)}
+        onAddCandidate={handleAddCandidate}
+        onAddJob={handleAddJob}
+      />
 
       {/* Explanation Modal */}
       <Modal
@@ -449,23 +442,17 @@ function SoftwareEngineerMatching() {
           >
             The system calculates a total match score for each candidate by combining
             three criteria, weighted according to the job's specifications.
-            <br />
-            <br />
-            <strong>Category Score:</strong>
-            <br />
+            <br /><br />
+            <strong>Category Score:</strong><br />
             Determined from the category similarity matrix. If a candidate's category
             perfectly matches the job's category, they receive the highest score. Related
             fields receive partial scores, and unrelated fields score lower.
-            <br />
-            <br />
-            <strong>Company Score Normalization:</strong>
-            <br />
+            <br /><br />
+            <strong>Company Score Normalization:</strong><br />
             The candidate's company score is normalized on a scale from 0 to 1. Higher
             company scores contribute more positively to the overall match score.
-            <br />
-            <br />
-            <strong>Seniority Score:</strong>
-            <br />
+            <br /><br />
+            <strong>Seniority Score:</strong><br />
             Calculated based on the absolute difference between the candidate's
             seniority level and the job's target seniority level.
             <ul>
@@ -476,19 +463,15 @@ function SoftwareEngineerMatching() {
                 A difference of <strong>1</strong>: Acceptable match (score of 0.7).
               </li>
               <li>
-                A difference of <strong>2 or more</strong>: Less suitable (score of
-                0.0).
+                A difference of <strong>2 or more</strong>: Less suitable (score of 0.0).
               </li>
             </ul>
-            <strong>Applying Weights:</strong>
-            <br />
+            <strong>Applying Weights:</strong><br />
             Each criterion is multiplied by its assigned weight. Weights reflect the
             importance of each criterion for the specific job. For example, a job might
             assign more weight to category match if expertise is crucial.
-            <br />
-            <br />
-            <strong>Total Match Score:</strong>
-            <br />
+            <br /><br />
+            <strong>Total Match Score:</strong><br />
             The weighted scores are summed and divided by the total weight. The result
             is a percentage representing the candidate's overall suitability.
           </Typography>
@@ -541,7 +524,7 @@ function SoftwareEngineerMatching() {
           </Typography>
         </Box>
       </Modal>
-    </div>
+    </Box>
   );
 }
 

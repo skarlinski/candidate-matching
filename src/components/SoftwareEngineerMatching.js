@@ -21,10 +21,6 @@ import {
   Button,
   Grid,
   Card,
-  CardContent,
-  CircularProgress,
-  AppBar,
-  Toolbar,
   Container
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/InfoOutlined';

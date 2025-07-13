@@ -7,6 +7,7 @@ import Candidates from './components/Candidates';
 import Jobs from './components/Jobs';
 import Matching from './components/Matching';
 import SoftwareEngineerMatching from './components/SoftwareEngineerMatching';
+import CandidateCompatibility from './components/CandidateCompatibility';
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           <Button color="inherit" component={Link} to="/candidates">Candidates</Button>
           <Button color="inherit" component={Link} to="/jobs">Job Descriptions</Button>
           <Button color="inherit" component={Link} to="/software-matching">Matching</Button>
+          <Button color="inherit" component={Link} to="/compatibility">Compatibility</Button>
         </Toolbar>
       </AppBar>
       <div style={{ padding: '20px', backgroundColor:'rgb(243, 244, 246)'  }}>
@@ -29,6 +31,7 @@ function App() {
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/matching" element={<Matching />} />
           <Route path="/software-matching" element={<SoftwareEngineerMatching />} />
+          <Route path="/compatibility" element={<CandidateCompatibility />} />
         </Routes>
       </div>
     </Router>
